@@ -294,6 +294,21 @@ macro(torch_hip_get_arch_list store_var)
 endmacro()
 
 ##############################################################################
+# Subset of PYTORCH_ROCM_ARCH also in TORCH_CK_GEMM_ARCH_LIST; keeps suffixes like gfx942:xnack+.
+function(torch_filter_ck_gemm_arches out_var)
+  set(_supported "${TORCH_CK_GEMM_ARCH_LIST}")
+  set(_filtered "")
+  foreach(_arch IN LISTS PYTORCH_ROCM_ARCH)
+    string(REGEX REPLACE ":.*$" "" _base "${_arch}")
+    list(FIND _supported "${_base}" _idx)
+    if(NOT _idx EQUAL -1)
+      list(APPEND _filtered "${_arch}")
+    endif()
+  endforeach()
+  set(${out_var} "${_filtered}" PARENT_SCOPE)
+endfunction()
+
+##############################################################################
 # Get the XPU arch flags specified by TORCH_XPU_ARCH_LIST.
 # Usage:
 #   torch_xpu_get_arch_list(variable_to_store_flags)
